@@ -34,4 +34,11 @@ public class TracksController : BaseApiController
         var result = await _mediator.Send(query, cancellationToken);
         return result.ToHttpResponse();
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(new GetTrackByIdQuery(id), cancellationToken);
+        return result.ToHttpResponse();
+    }
 }

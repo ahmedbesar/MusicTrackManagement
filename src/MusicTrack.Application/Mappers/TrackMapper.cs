@@ -11,4 +11,10 @@ public partial class TrackMapper
     public partial TrackResponseDto ToResponseDto(Track track);
 
     public partial IEnumerable<TrackResponseDto> ToResponseListDto(IEnumerable<Track> tracks);
+
+    public partial TrackDetailResponseDto ToDetailResponseDto(Track track);
+
+    [MapperIgnoreSource(nameof(TrackDistribution.TrackId))]
+    [MapperIgnoreSource(nameof(TrackDistribution.Track))]
+    public partial TrackDistributionResponseDto ToDistributionResponseDto(TrackDistribution distribution);
 }

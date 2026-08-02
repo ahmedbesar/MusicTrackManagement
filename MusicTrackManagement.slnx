@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="MusicTrackManagement/MusicTrackManagement.csproj" />
+  <Project Path="src/MusicTrack.Api/MusicTrack.Api.csproj" />
+  <Project Path="src/MusicTrack.Application/MusicTrack.Application.csproj" />
+  <Project Path="src/MusicTrack.Core/MusicTrack.Core.csproj" />
+  <Project Path="src/MusicTrack.Infrastructure/MusicTrack.Infrastructure.csproj" />
 </Solution>

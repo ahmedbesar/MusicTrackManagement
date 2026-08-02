@@ -26,4 +26,12 @@ I did not write raw C#/TypeScript line-by-line, but I read every generated file,
 
 ## 2. What security issues did I find (or the AI introduce)? How did I handle them?
 
+### 1. Missing Authorization Protection
+
+Some generated endpoints were accessible without authentication.
+
 ## 3. One thing the AI got wrong that I had to fix
+
+The AI hardcoded the LocalDB connection string as a `const string` inside `MusicTrackDbContextFactory` (the `IDesignTimeDbContextFactory` used by `dotnet ef` tooling), instead of reading it from `appsettings.json` where the same connection string is already defined for the running API. This meant there were two copies of the connection string in the codebase — if I ever changed the one in `appsettings.json` (different server, database name, credentials, etc.), the `dotnet ef migrations`/`database update` commands would silently keep using the old hardcoded value, causing confusing drift between what the tooling connects to and what the app actually runs against.
+
+I caught this on review and had it fixed to build an `IConfiguration` from the startup project's `appsettings.json` (`dotnet ef` sets the working directory to the `--startup-project` when the factory runs, which is the documented pattern for this), so there is now a single source of truth for the connection string. I verified the fix by temporarily pointing `appsettings.json` at a different database name and confirming `dotnet ef database update` picked it up with no `--connection` override, then reverted the change.

@@ -15,6 +15,7 @@ public static class ApplicationServiceExtensions
 
         services.AddSingleton<ArtistMapper>();
         services.AddSingleton<TrackMapper>();
+        services.AddSingleton<DspMapper>();
 
         services.AddValidatorsFromAssembly(assembly);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));

@@ -3,3 +3,4 @@ export * from './distribution-status.model';
 export * from './track.model';
 export * from './track-distribution.model';
 export * from './track-detail.model';
+export * from './login-response.model';

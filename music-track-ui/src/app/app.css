@@ -1,4 +1,7 @@
 .app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1rem 1.5rem;
   background-color: #1f2933;
   color: #fff;
@@ -7,6 +10,23 @@
 .app-header h1 {
   margin: 0;
   font-size: 1.25rem;
+}
+
+.app-header nav a,
+.app-header nav button {
+  color: #fff;
+  background: none;
+  border: 1px solid #fff;
+  border-radius: 4px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.app-header nav a:hover,
+.app-header nav button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .app-main {

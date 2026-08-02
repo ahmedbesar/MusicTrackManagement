@@ -1,5 +1,12 @@
 <header class="app-header">
   <h1>Music Track Management</h1>
+  <nav>
+    @if (isAuthenticated()) {
+      <button type="button" (click)="onSignOut()">Sign out</button>
+    } @else {
+      <a routerLink="/login">Sign in</a>
+    }
+  </nav>
 </header>
 
 <main class="app-main">

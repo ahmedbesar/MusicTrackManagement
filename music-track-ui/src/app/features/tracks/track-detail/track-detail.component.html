@@ -1,0 +1,57 @@
+<section>
+  <a routerLink="/tracks" class="back-link">&larr; Back to tracks</a>
+
+  @if (loading()) {
+    <p>Loading track…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else if (track(); as track) {
+    <h2>{{ track.title }}</h2>
+
+    <dl class="track-info">
+      <dt>Artist</dt>
+      <dd>{{ track.artistName }}</dd>
+
+      <dt>Genre</dt>
+      <dd>{{ track.genre }}</dd>
+
+      <dt>ISRC</dt>
+      <dd>{{ track.isrc }}</dd>
+
+      <dt>Release date</dt>
+      <dd>{{ track.releaseDate }}</dd>
+
+      <dt>Status</dt>
+      <dd>
+        <span class="status-badge" [attr.data-status]="track.status">{{ track.status }}</span>
+      </dd>
+    </dl>
+
+    <h3>DSP distributions</h3>
+
+    @if (track.distributions.length === 0) {
+      <p>This track has not been submitted to any DSP yet.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>DSP</th>
+            <th>Submitted at</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (distribution of track.distributions; track distribution.id) {
+            <tr>
+              <td>{{ distribution.dspName }}</td>
+              <td>{{ distribution.submittedAt | date: 'medium' }}</td>
+              <td>
+                <span class="status-badge" [attr.data-status]="distribution.status">{{ distribution.status }}</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  }
+</section>

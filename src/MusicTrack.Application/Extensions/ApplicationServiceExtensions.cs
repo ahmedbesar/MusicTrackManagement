@@ -14,6 +14,7 @@ public static class ApplicationServiceExtensions
         var assembly = Assembly.GetExecutingAssembly();
 
         services.AddSingleton<ArtistMapper>();
+        services.AddSingleton<TrackMapper>();
 
         services.AddValidatorsFromAssembly(assembly);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));

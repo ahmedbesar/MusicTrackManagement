@@ -1,0 +1,114 @@
+---
+description: Main project coding standards — follow Ecommerce (Catalog/Basket) as the primary architecture reference
+alwaysApply: true
+---
+
+# Coding Standards (Main Reference)
+
+**Primary reference project:** `D:\work\MicroServices\Ecommerce\Ecommerce`
+
+When implementing features, mirror the **modern Catalog / Basket / Discount** style in that repo (not Ordering — it is older and inconsistent). Prefer looking at those services for layering, CQRS, validation, Result, mapping, and API patterns before inventing new ones.
+
+## Methods
+
+- Keep methods small and focused on a single responsibility.
+- Extract private methods when a method becomes large or difficult to read.
+
+## Architecture (Clean Architecture + CQRS)
+
+Per feature/service use four layers:
+
+| Layer | Project | Contains |
+|-------|---------|----------|
+| Api | `*.Api` | Controllers, `Program.cs`, DI, `ResultExtensions` |
+| Application | `*.Application` | Commands, Queries, Handlers, Validators, Behaviors, Mappers, Responses, Constants |
+| Core | `*.Core` | Entities, repository interfaces, specs/pagination |
+| Infrastructure | `*.Infrastructure` | Repository implementations, DbContext, persistence |
+
+Dependency direction: **Api → Application → Core ← Infrastructure**.
+
+Application folder layout:
+
+```text
+Application/
+  Behaviors/
+  Commands/
+  Constants/
+  Handlers/Commands/
+  Handlers/Queries/
+  Mappers/
+  Queries/
+  Responses/
+  Validators/
+```
+
+## CQRS (MediatR)
+
+- Commands/Queries are `sealed record` implementing `IRequest<Result>` or `IRequest<Result<T>>` (FluentResults).
+- Naming: `CreateProductCommand`, `GetProductByIdQuery`.
+- Handlers are `sealed class` implementing `IRequestHandler<TRequest, Result|Result<T>>`.
+- Handler folders: `Handlers/Commands/`, `Handlers/Queries/`.
+- Controllers stay thin: `_mediator.Send(...)` then `return result.ToHttpResponse()`.
+
+## DTOs / Responses
+
+- Response DTOs live in `Application/Responses/`.
+- All DTOs (and Commands/Queries used as request bodies) must be `sealed record`.
+- Naming: `{Entity}ResponseDto`.
+
+## Entities
+
+- Domain entities live in Core.
+- Prefer a shared base (`BaseEntity` / `EntityBase`) when useful.
+- Use static factory methods for entity creation when introducing domain logic (stricter than Ecommerce POCOs).
+
+## Validation (FluentValidation)
+
+- Use FluentValidation; one validator per Command/Query.
+- Validators must be `sealed` and inherit `AbstractValidator<T>`.
+- Do **not** validate manually inside handlers — register MediatR `ValidationBehavior` that turns failures into `Result.Fail` / `Result.Fail<T>`.
+- Put length/rule limits in static `*Constants` / `ValidationConstants`.
+
+```csharp
+public sealed class CreateProductCommandValidator
+    : AbstractValidator<CreateProductCommand>
+{
+    public CreateProductCommandValidator()
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(ValidationConstants.NameMaxLength);
+    }
+}
+```
+
+Pipeline behaviors (Application): `UnhandledExceptionBehavior`, `LoggingBehavior`, `ValidationBehavior`.
+
+## Result Pattern (FluentResults)
+
+- Handlers return `FluentResults.Result` or `Result<T>` — **not** a custom `ResultDto<T>`.
+- Success: `Result.Ok(value)` / `Result.Ok()`.
+- Failure: `Result.Fail("…")` / `Result.Fail<T>("…")`.
+- API maps via `ToHttpResponse()` (success → 200, failure → 400 with errors).
+
+```csharp
+Task<Result<ProductResponseDto>> Handle(
+    CreateProductCommand request,
+    CancellationToken cancellationToken);
+```
+
+## Mapping
+
+- Use **Mapperly** (`Riok.Mapperly`) for all object mapping.
+- `[Mapper] public partial class {Entity}Mapper` with methods like `ToEntity`, `ToResponseDto`.
+- Register mappers as Singleton; inject into handlers.
+
+## Cancellation Tokens
+
+- Pass `CancellationToken` through all async methods (handlers → repositories → infrastructure).
+- Prefer `CancellationToken cancellationToken = default` on repository interfaces.
+
+## Repositories
+
+- Interfaces in Core (`Interfaces` or `Repositories`).
+- Implementations in Infrastructure; register as Scoped.

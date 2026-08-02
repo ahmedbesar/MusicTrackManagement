@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using MusicTrack.Application.Behaviors;
+using MusicTrack.Application.Mappers;
 
 namespace MusicTrack.Application.Extensions;
 
@@ -11,6 +12,8 @@ public static class ApplicationServiceExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         var assembly = Assembly.GetExecutingAssembly();
+
+        services.AddSingleton<ArtistMapper>();
 
         services.AddValidatorsFromAssembly(assembly);
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));

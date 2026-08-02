@@ -50,4 +50,12 @@ public class TracksController : BaseApiController
         var result = await _mediator.Send(command with { TrackId = id }, cancellationToken);
         return result.ToHttpResponse();
     }
+
+    [Authorize]
+    [HttpPatch("{id:guid}/status")]
+    public async Task<ActionResult> UpdateStatus(Guid id, [FromBody] UpdateTrackStatusCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command with { TrackId = id }, cancellationToken);
+        return result.ToHttpResponse();
+    }
 }

@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicTrack.Api.Extensions;
 using MusicTrack.Application.Commands;
@@ -39,6 +40,14 @@ public class TracksController : BaseApiController
     public async Task<ActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var result = await _mediator.Send(new GetTrackByIdQuery(id), cancellationToken);
+        return result.ToHttpResponse();
+    }
+
+    [Authorize]
+    [HttpPost("{id:guid}/distribute")]
+    public async Task<ActionResult> Distribute(Guid id, [FromBody] DistributeTrackCommand command, CancellationToken cancellationToken)
+    {
+        var result = await _mediator.Send(command with { TrackId = id }, cancellationToken);
         return result.ToHttpResponse();
     }
 }
